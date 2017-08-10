@@ -1,0 +1,7 @@
+﻿  stdafx.cpp
+  Engine.cpp
+c:\users\xdevp\documents\github\epsiloncheats\utils.h(1): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Generating code
+c:\users\xdevp\documents\github\epsiloncheats\engine.cpp(503): warning C4715: 'Functions::GetTagPos' : not all control paths return a value
+c:\users\xdevp\documents\github\epsiloncheats\engine.cpp(359): warning C4715: 'Gui::getXValue' : not all control paths return a value
+  Finished generating code
