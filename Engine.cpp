@@ -2,6 +2,61 @@
 #include "Engine.h"
 #include "utils.h"
 
+namespace MW3{
+#pragma region Enums
+	enum Keys : BYTE {
+		Key_A = 0x01,
+		Key_B = 0x02,
+		Key_X = 0x03,
+		Key_Y = 0x04,
+		Key_LB = 0x05,
+		Key_RB = 0x06,
+		Key_Start = 0x0E,
+		Key_Back = 0x0F,
+		Key_LS = 0x10,
+		Key_RS = 0x11,
+		Key_LT = 0x12,
+		Key_RT = 0x13,
+		Key_Up = 0x14,
+		Key_Down = 0x15,
+		Key_Left = 0x16,
+		Key_Right = 0x17,
+	};
+	enum EntityType_t {
+		ET_GENERAL,
+		ET_PLAYER,
+		ET_CORPSE,
+		ET_ITEM,
+		ET_MISSLE,
+		ET_INVISIBLE_ENTITY,
+		ET_SCRIPTMOVER,
+		ET_SOUND_BLEND,
+		ET_FX,
+		ET_LOOP_FX,
+		ET_PRIMARY_LIGHT,
+		ET_TURRET,
+		ET_HELICOPTER,
+		ET_PLANE,
+		ET_VEHICLE,
+		ET_VEHICLE_COLLMAP,
+		ET_VEHICLE_CORPSE,
+		ET_VEHICLE_SPAWNER
+	};
+	enum Submenu {
+		Closed,
+		Main,
+		Main_Options,
+		ESP_Options,
+		Aimbot_Options,
+		Rebind_Options,
+	};
+	enum align {
+		ALIGN_LEFT,
+		ALIGN_CENTER,
+		ALIGN_RIGHT,
+
+	};
+#pragma endregion
 #pragma region Classes & Structs
 class Material {
 public:
@@ -967,8 +1022,7 @@ void ResetVars() {
 	UIItems.rightPress = false;
 }
 
-void Hook()
-{
+void Hook(){
 	if (Internal::Dvar_GetBool("cl_ingame")) {
 		Functions::GrabStructs();
 		LoopedStatements();
@@ -1047,8 +1101,7 @@ void Hook()
 			break;
 		}
 		ResetVars();
-	}
-	else {
+	} else {
 		Toggles.SetNewRadarZoom = true;
 		Gui::TopRightInfo("Epsilon Engine v0.01b Loaded!", 1);
 	}
@@ -1161,9 +1214,9 @@ DWORD XamInputHook(DWORD r3, int r4, PXINPUT_STATE r5) {
 	}
 
 	if (Toggles.Crouch) {
-		wait(0.1);
+		wait(0.5);
 		r5->Gamepad.wButtons = 0x2000;
-		wait(0.1);
+		wait(0.5);
 		Toggles.Crouch = false;
 	}
 
@@ -1180,9 +1233,12 @@ DWORD CL_WritePacketHook(int r3) {
 
 	return result;
 }
+}
+namespace BO2 {
 
-void Engine()
-{
+}
+
+void Engine(){
 	Sleep(10000);
 	for(;;) {
 		if (XamGetCurrentTitleId() == DASHBOARD){
@@ -1196,15 +1252,23 @@ void Engine()
 		} else if (XamGetCurrentTitleId() == COD_MW3){
 			if (bInitialized == FALSE) {
 
-				UIItems.maxOptions = 16;
-				Toggles.DeleteOriginalRadar = true;
+				MW3::UIItems.maxOptions = 16;
+				MW3::Toggles.DeleteOriginalRadar = true;
 
-				XNotify(L"Epsilon Cheats Hooked");
-				DetourFunction((PDWORD)0x82309108, (int)Hook);
-				DetourFunction((PDWORD)0x82444448, (int)AimbotHook);
-				HookFunctionStart((DWORD*)0x8241F038, (DWORD*)AddCmdDrawStretchPicStub, (DWORD)AddCmdDrawStretchPicHook);
-				HookFunctionStart((DWORD*)0x8257FE8C, (DWORD*)XamInputStub, (DWORD)XamInputHook);
+				XNotify(L"Epsilon Cheats Hooked: MW3");
+				DetourFunction((PDWORD)0x82309108, (int)MW3::Hook);
+				DetourFunction((PDWORD)0x82444448, (int)MW3::AimbotHook);
+				HookFunctionStart((DWORD*)0x8241F038, (DWORD*)MW3::AddCmdDrawStretchPicStub, (DWORD)MW3::AddCmdDrawStretchPicHook);
+				HookFunctionStart((DWORD*)0x8257FE8C, (DWORD*)MW3::XamInputStub, (DWORD)MW3::XamInputHook);
 				//HookFunctionStart((DWORD*)0x8216DAF0, (DWORD*)CL_WritePacketStub, (DWORD)CL_WritePacketHook);
+				bInitialized = TRUE;
+			}
+		} else if (XamGetCurrentTitleId() == COD_BO2) {
+			if (bInitialized == FALSE) {
+				XNotify(L"Epsilon Cheats Hooked: BO2");
+
+
+
 				bInitialized = TRUE;
 			}
 		} else {
@@ -1214,8 +1278,7 @@ void Engine()
 	}
 }
 
-BOOL WINAPI DllMain(HANDLE hInstDLL, DWORD fdwReason, LPVOID lpReserved)
-{
+BOOL WINAPI DllMain(HANDLE hInstDLL, DWORD fdwReason, LPVOID lpReserved){
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
 		HANDLE hThread; DWORD hThreadID;
